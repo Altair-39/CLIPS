@@ -93,14 +93,29 @@
    (assert (ancestor (x ?parent) (y ?child-y)))
 )   
 
-(defrule sibling
-  (goal sibling ?z ?y)
-  (goal sibling ?z ?yb &(neq ?z ?y))
+
+(defrule siblings
+  (goal sibling ?z ?y & ~ ?z)
+  (goal sibling ?z ?y &:(neq ?z ?y))
   (parent (x ?x) (y ?z))
   (parent (x ?x) (y ?y))
   (human (name ?z))
   (human (name ?y))
-  (human (name ?x))
+  (human (name ?x))  
 =>
-  (assert (sibling (x ?z) (y ?y)))
+ (assert (sibling (x ?z) (y ?y)))
+) 
+
+(defrule sibling-print-ok
+  (goal sibling ?z ?y)
+  (sibling (x ?z) (y ?y))
+=> 
+  (printout t ?z " e " ?y " sono fratelli/sorelle." crlf)
+)
+
+(defrule sibling-print-ko (declare (salience -10))
+  (goal sibling ?z ?y)
+  (not (sibling (x ?z) (y ?y)))
+=> 
+  (printout t ?z " e " ?y " non sono fratelli/sorelle." crlf)
 )
